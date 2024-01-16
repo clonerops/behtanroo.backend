@@ -7,6 +7,8 @@ import api from './routes';
 const app = express()
 
 export const runServer = () => {
+    app.set('trust proxy', 1);
+    
     app.use(bodyParser.urlencoded({extended: true}))
     app.use(bodyParser.json())
 
