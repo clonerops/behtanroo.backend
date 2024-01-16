@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 const secretKey = process.env.SECRET_KEY;
 
 const authController = {
-    signin: async (req, res, next) => {
+    signup: async (req, res, next) => {
         try {
             const {firstName, lastName, userName, mobile, email, password, confirmPassword} = req.body
 
@@ -34,7 +34,7 @@ const authController = {
         }
     },
     
-    signup: async (req, res, next) => {
+    signin: async (req, res, next) => {
         try {
             const {userName, password} = req.body
             if(!userName || !password) return res.status(400).json({message: "فیلد ها اجباری می باشند"}) 
@@ -55,7 +55,7 @@ const authController = {
                     (err, token) => {
                         res.json({
                             success: true,
-                            token: "Bearer " + token,
+                            token: token,
                         });
                     }
 )
