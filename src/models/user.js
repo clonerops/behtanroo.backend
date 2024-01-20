@@ -1,53 +1,30 @@
-import { Schema, model } from 'mongoose'
+const { DataTypes } =  require('sequelize')
+const sequelize =  require('../database/connection')
 
-const User = new Schema({
+const User = sequelize.define("User",{
     firstName: {
-        type: String
+        type: DataTypes.STRING
     },
 
     lastName: {
-        type: String 
+        type: DataTypes.STRING
     },
 
     userName: {
-        type: String,
-        required: true,
-        index: {
-            unique: true
-        }
+        type: DataTypes.STRING,
     },
 
     email: {
-        type: String
+        type: DataTypes.STRING
     },
-    
+
     mobile: {
-        type: String
+        type: DataTypes.STRING
     },
 
     password: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
     },
-
-    createdAt: {
-        type: Date,
-        default: Date.now(),
-    },
-    updatedAt: {
-        type: Date,
-        default: null,
-    },
-}, {
-    timestamps: true,
-    versionKey: false,
-    id: true,
-    toJSON: {
-        transform(doc, ret) {
-            ret.id = ret._id
-            delete ret._id
-        }
-    }
 })
 
-export default model("User", User)
+module.exports = User

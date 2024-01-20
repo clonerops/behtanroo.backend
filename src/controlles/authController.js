@@ -1,6 +1,6 @@
-import User from '../models/user'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+const User = require('../models/user.js') 
+const bcrypt = require('bcrypt') 
+const jwt = require('jsonwebtoken') 
 const secretKey = process.env.SECRET_KEY;
 
 const authController = {
@@ -68,4 +68,4 @@ const authController = {
     }
 }
 
-export default authController
+module.exports = authController

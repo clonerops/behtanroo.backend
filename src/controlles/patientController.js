@@ -1,4 +1,4 @@
-import Patient from "../models/patient";
+const Patient = require ("../models/patient.js");
 
 const patientController = {
     createPatient: async (req, res, next) => {
@@ -69,4 +69,4 @@ const patientController = {
     },
 }
 
-export default patientController
+module.exports = patientController

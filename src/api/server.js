@@ -1,13 +1,12 @@
-import express from 'express'
+const express = require('express') 
 
-import cors from 'cors'
-import bodyParser from 'body-parser'
-import api from './routes';
+const cors = require('cors') 
+const bodyParser = require('body-parser') 
+const api = require('./routes') 
 
 const app = express()
 
-export const runServer = () => {
-    app.set('trust proxy', 1);
+const runServer = () => {
     
     app.use(bodyParser.urlencoded({extended: true}))
     app.use(bodyParser.json())
@@ -23,3 +22,4 @@ export const runServer = () => {
     })
 }
 
+module.exports = runServer

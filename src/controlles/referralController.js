@@ -1,5 +1,5 @@
-import Referral from "../models/referral";
-import Patient from '../models/patient'
+const Referral = require("../models/referral.js");
+const Patient  = require('../models/patient.js')
 
 const referralController = {
     createReferral: async (req, res, next) => {
@@ -40,4 +40,4 @@ const referralController = {
     }
 }
 
-export default referralController
+module.exports = referralController

@@ -1,9 +1,9 @@
-import {readdirSync} from "fs";
-import {Router} from 'express';
-// import paymentRouter from './payment'
-import patienRouter from './patientRoutes'
-import referralRouter from './referralRoutes'
-import authRouter from './authRoutes'
+const {readdirSync} = require("fs") ;
+const {Router} = require('express') ;
+// const paymentRouter = require() './payment'
+const patienRouter = require('./patientRoutes.js') 
+const referralRouter = require('./referralRoutes.js') 
+const authRouter = require('./authRoutes.js') 
 
 const router = Router()
 
@@ -17,4 +17,4 @@ readdirSync('src/api/routes').map(async (route) => {
 });
 
 
-export default router
+module.exports = router

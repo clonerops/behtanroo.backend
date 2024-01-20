@@ -1,63 +1,42 @@
-import mongoose, { Schema, model } from 'mongoose'
 
-const Patient = new Schema({
+const { DataTypes } =  require('sequelize')
+const Referral =  require('./referral')
+const sequelize =  require('../database/connection')
+
+
+const Patient = sequelize.define("Patient",{
     firstName: {
-        type: String
+        type: DataTypes.STRING
     },
 
     lastName: {
-        type: String
+        type: DataTypes.STRING
     },
 
     nationalCode: {
-        type: String
+        type: DataTypes.STRING
     },
 
     mobile: {
-        type: String
+        type: DataTypes.STRING
     },
 
     mobile2: {
-        type: String
+        type: DataTypes.STRING
     },
 
     tel: {
-        type: String
+        type: DataTypes.STRING
     },
 
     Address: {
-        type: String
+        type: DataTypes.STRING
     },
 
     patientCode: {
-        type: Number,
+        type: DataTypes.INTEGER,
     },
-
-    referral: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Referrals"
-    }],
-
-    createdAt: {
-        type: Date,
-        default: Date.now(),
-    },
-    updatedAt: {
-        type: Date,
-        default: null,
-    },
-
-}, {
-    timestamps: true,
-    versionKey: false,
-    id: true,
-    toJSON: {
-        transform(doc, ret) {
-            ret.id = ret._id
-            delete ret._id
-        }
-    }
 })
 
 
-export default model('Patients', Patient);
+module.exports = Patient

@@ -1,20 +1,32 @@
-import { } from 'dotenv/config';
-import { runServer } from "./src/api/server";
+const { } = require('dotenv/config')
+const sequelize = require('./src/database/connection.js')
 
-import mongoose from 'mongoose';
 
-const MONGODB_CONFIG = {
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-};
 
-const init = () => {
-    mongoose.connect(process.env.MONGO_URI, MONGODB_CONFIG)
-        .then(() => console.log('MongoDB connected.'))
-        .then(() => runServer())
-        .catch(err => console.log(err));
-};
+const express = require('express')
 
-init();
+const cors = require('cors')
+const bodyParser = require('body-parser')
+const api = require('./src/api/routes/index.js')
+
+const app = express()
+
+
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+
+app.use(cors())
+
+app.use('/api', api)// Defining server port
+
+const port = process.env.PORT || 8000
+
+sequelize.sync()
+    .then((result) => {
+        console.log("Connected")
+        app.listen(port, () => {
+            console.log(`Running on http://localhost:${port}`)
+        })
+    })
+    .catch((err) => console.log(err))
+

@@ -1,5 +1,5 @@
-import express from 'express'
-import patientController from '../../controlles/patientController'
+const express = require('express') 
+const patientController = require('../../controlles/patientController.js') 
 
 const router = express.Router()
 
@@ -9,4 +9,4 @@ router.get('/:id', patientController.getPatientsById)
 router.get('/:id/referral', patientController.getPatientReferralById)
 
 
-export default router
+module.exports = router
