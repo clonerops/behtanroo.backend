@@ -1,5 +1,5 @@
 const { DataTypes } =  require('sequelize')
-const sequelize =  require('../database/connection')
+const sequelize =  require('../database/connection');
 
 const Referral = sequelize.define("Referral",{
     referralDate: {
@@ -14,3 +14,4 @@ const Referral = sequelize.define("Referral",{
 })
 
 module.exports = Referral
+

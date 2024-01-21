@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "aBo217767345",
+    "database": "behdb",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "aBo217767345",
+    "database": "behdb",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "aBo217767345",
+    "database": "behdb",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
