@@ -5,7 +5,7 @@ const referralController = {
     createReferral: async (req, res, next) => {
         try {
             const {patientId, referralDate, referralReason, description} = req.body;
-            const isExistPatient = await Patient.findOne({where: {id: patientId}})
+            const isExistPatient = await Patient.findOne({where: { id: patientId }})
             if(!isExistPatient) {
                 return res.status(400).json({
                     message: "بیمار یافت نشد"
@@ -27,7 +27,7 @@ const referralController = {
     
     getAllReferral: async (req, res, next) => {
         try {
-            const referrals = await Referral.findAll({include: Patient})
+            const referrals = await Referral.findAll()
             return res.status(200).json(referrals)    
         } catch (error) {
             console.log(error)

@@ -21,7 +21,7 @@ app.use('/api', api)// Defining server port
 
 const port = process.env.PORT || 8000
 
-sequelize.sync()
+sequelize.sync({logging: false})
     .then((result) => {
         console.log("Connected")
         app.listen(port, () => {

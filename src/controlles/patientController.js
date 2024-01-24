@@ -1,4 +1,5 @@
 const Patient = require ("../models/patient.js");
+const Referral = require("../models/referral.js");
 
 const patientController = {
     createPatient: async (req, res, next) => {
@@ -32,7 +33,7 @@ const patientController = {
     getAllPatients: async (req, res, next) => {
         try {
 
-            const patients = await Patient.find()
+            const patients = await Patient.findOne({include: {model: Referral}})
             return res.status(200).json( patients )
             
         } catch (error) {
@@ -42,7 +43,7 @@ const patientController = {
     
     getPatientsById: async (req, res, next) => {
         try {
-            const patient = await Patient.findOne({_id: req.params.id})
+            const patient = await Patient.findOne({ where: { id: req.params.id } })
             return res.status(200).json( patient )
 
         } catch (error) {
@@ -52,7 +53,7 @@ const patientController = {
 
     getPatientReferralById: async (req, res, next) => {
         try {
-            const patient = await Patient.findOne({_id: req.params.id}).populate("referral")
+            const patient = await Patient.findOne({ where: { id: req.params.id } }).populate("referral")
             return res.status(200).json( patient )
 
         } catch (error) {

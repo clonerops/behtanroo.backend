@@ -4,7 +4,7 @@ const Referral =  require('./referral')
 const sequelize =  require('../database/connection')
 
 
-const Patient = sequelize.define("Patient",{
+const Patient = sequelize.define("patient",{
     firstName: {
         type: DataTypes.STRING
     },
@@ -37,5 +37,7 @@ const Patient = sequelize.define("Patient",{
         type: DataTypes.INTEGER,
     },
 })
+
+Patient.hasMany(Referral)
 
 module.exports = Patient

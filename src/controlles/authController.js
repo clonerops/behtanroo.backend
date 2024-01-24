@@ -8,7 +8,7 @@ const authController = {
         try {
             const {firstName, lastName, userName, mobile, email, password, confirmPassword} = req.body
 
-            const findUser = await User.findOne({userName})
+            const findUser = await User.findOne({where: {userName: userName}})
 
             if(findUser) return res.status(400).json({message: "کاربری با این مشخصات قبلا در سامانه ثبت نام کرده است"})
             else if(password !== confirmPassword) return res.status(400).json({message: "رمز عبور و تکرار آن باهم برابر نیستند"})
@@ -17,7 +17,7 @@ const authController = {
                 const salt = await bcrypt.genSalt(12)
                 const hashedPass = await bcrypt.hash(password, salt)
     
-                const newUser = new User({
+                const newUser = await User.create({
                     firstName,
                     lastName,
                     userName,
@@ -25,7 +25,6 @@ const authController = {
                     email,
                     password: hashedPass,
                 })
-                await newUser.save()
                 return res.status(201).json({newUser})
             }
     
@@ -38,7 +37,7 @@ const authController = {
         try {
             const {userName, password} = req.body
             if(!userName || !password) return res.status(400).json({message: "فیلد ها اجباری می باشند"}) 
-            const user = await User.findOne({userName})
+            const user = await User.findOne({where: {userName: userName}})
 
             if(!user) return res.status(400).json({message: "کاربر یافت نشد"})
             else {

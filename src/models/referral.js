@@ -1,7 +1,7 @@
 const { DataTypes } =  require('sequelize')
 const sequelize =  require('../database/connection');
 
-const Referral = sequelize.define("Referral",{
+const Referral = sequelize.define("referral",{
     referralDate: {
         type: DataTypes.DATE
     },
