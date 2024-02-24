@@ -4,7 +4,7 @@ const Referral = require("../models/referral.js");
 const patientController = {
     createPatient: async (req, res, next) => {
         try {
-            const { firstName, lastName, nationalCode, mobile, mobile2, tel, address } = req.body;
+            const { firstName, lastName, nationalCode, mobile, mobile2, tel, address, gender, description } = req.body;
             const isExist = await Patient.findOne({where: {nationalCode: nationalCode}})
             if(isExist) {
                 return res.status(400).json({
@@ -20,6 +20,8 @@ const patientController = {
                     mobile2,
                     tel,
                     address,
+                    gender, 
+                    description,
                     patientCode: Math.floor(Math.random()*1000000)
                 })
 

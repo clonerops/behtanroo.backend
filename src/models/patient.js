@@ -1,7 +1,8 @@
 
 const { DataTypes } =  require('sequelize')
 const Referral =  require('./referral')
-const sequelize =  require('../database/connection')
+const sequelize =  require('../database/connection');
+const Document = require('./document');
 
 
 const Patient = sequelize.define("patient",{
@@ -29,22 +30,27 @@ const Patient = sequelize.define("patient",{
         type: DataTypes.STRING
     },
 
-    Address: {
+    address: {
         type: DataTypes.STRING
+    },
+
+    gender: {
+        type: DataTypes.SMALLINT
+    },
+
+    description: {
+        type: DataTypes.TEXT
     },
 
     patientCode: {
         type: DataTypes.INTEGER,
-        unique: true,
-        // autoIncrement: true,
-        // defaultValue: 1000
     },
 }, {
     hooks: {
         beforeCreate: (patient, options) => {
             return Patient.max('patientCode')
                 .then(maxCode => {
-                    const nextCode = maxCode ? maxCode + 1 : 1001;
+                    const nextCode = maxCode ? maxCode + 1 : 100;
                     patient.patientCode = nextCode;
                 });
         }
@@ -52,5 +58,6 @@ const Patient = sequelize.define("patient",{
 })
 
 Patient.hasMany(Referral)
+
 
 module.exports = Patient
