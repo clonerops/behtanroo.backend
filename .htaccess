@@ -1,0 +1,20 @@
+RewriteEngine On
+
+# Redirect all requests to the Node.js app running on port 3000
+RewriteCond %{REQUEST_URI} !^/your-node-app/
+RewriteRule ^(.*)$ /your-node-app/$1 [L,PT]
+
+# Proxy settings
+<IfModule mod_proxy.c>
+    ProxyRequests Off
+    ProxyPreserveHost On
+    ProxyVia Full
+
+    <Proxy *>
+        Require all granted
+    </Proxy>
+
+    # Adjust this to match your Node.js app's address and port
+    ProxyPass /your-node-app/ http://localhost:3000/
+    ProxyPassReverse /your-node-app/ http://localhost:3000/
+</IfModule>

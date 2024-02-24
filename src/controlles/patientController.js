@@ -33,7 +33,7 @@ const patientController = {
     getAllPatients: async (req, res, next) => {
         try {
 
-            const patients = await Patient.findOne({include: {model: Referral}})
+            const patients = await Patient.findAll({include: {model: Referral}})
             return res.status(200).json( patients )
             
         } catch (error) {
@@ -53,7 +53,7 @@ const patientController = {
 
     getPatientReferralById: async (req, res, next) => {
         try {
-            const patient = await Patient.findOne({ where: { id: req.params.id } }).populate("referral")
+            const patient = await Patient.findOne({ where: { id: req.params.id }, include: Referral })
             return res.status(200).json( patient )
 
         } catch (error) {

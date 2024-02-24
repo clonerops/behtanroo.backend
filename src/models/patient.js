@@ -35,7 +35,20 @@ const Patient = sequelize.define("patient",{
 
     patientCode: {
         type: DataTypes.INTEGER,
+        unique: true,
+        // autoIncrement: true,
+        // defaultValue: 1000
     },
+}, {
+    hooks: {
+        beforeCreate: (patient, options) => {
+            return Patient.max('patientCode')
+                .then(maxCode => {
+                    const nextCode = maxCode ? maxCode + 1 : 1001;
+                    patient.patientCode = nextCode;
+                });
+        }
+    }
 })
 
 Patient.hasMany(Referral)
