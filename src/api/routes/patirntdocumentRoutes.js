@@ -4,5 +4,6 @@ const patientDocumentController = require('../../controlles/patient-document-Con
 const router = express.Router()
 
 router.post('/', patientDocumentController.createPatientDocument)
+router.get('/', patientDocumentController.listOfPatientDocument)
 
 module.exports = router
