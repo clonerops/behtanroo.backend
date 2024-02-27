@@ -5,5 +5,6 @@ const router = express.Router()
 
 router.post('/', patientDocumentController.createPatientDocument)
 router.get('/', patientDocumentController.listOfPatientDocument)
+router.get('/:id', patientDocumentController.getPatientDocumnetById)
 
 module.exports = router

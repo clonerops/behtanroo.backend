@@ -38,6 +38,14 @@ const patientDocumentController = {
             data: results
         })
 
+    },
+
+    getPatientDocumnetById: async (req, res, next) => {
+        const patientDocument = await PatientDocument.findOne({where: {id: req.params.id}, include: Patient})
+        return res.status(200).json({
+            success: true,
+            data: patientDocument
+        })
     }
 }
 

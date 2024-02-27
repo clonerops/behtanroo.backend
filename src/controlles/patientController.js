@@ -1,3 +1,4 @@
+const Document = require("../models/document.js");
 const Patient = require("../models/patient.js");
 const Referral = require("../models/referral.js");
 const exceljs = require('exceljs')
@@ -46,7 +47,9 @@ const patientController = {
 
     getPatientsById: async (req, res, next) => {
         try {
-            const patient = await Patient.findOne({ where: { id: req.params.id } })
+            const patient = await Patient.findOne({ where: { id: req.params.id }, 
+                include: Document
+            })
             return res.status(200).json(patient)
 
         } catch (error) {
@@ -56,7 +59,9 @@ const patientController = {
 
     getPatientReferralById: async (req, res, next) => {
         try {
-            const patient = await Patient.findOne({ where: { id: req.params.id }, include: Referral })
+            const patient = await Patient.findOne({ where: { id: req.params.id }, 
+                
+            include: Referral })
             return res.status(200).json(patient)
 
         } catch (error) {
