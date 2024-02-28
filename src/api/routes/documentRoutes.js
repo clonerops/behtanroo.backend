@@ -1,9 +1,10 @@
 const express = require('express')
 const documentController = require('../../controlles/documentController.js') 
+const authMiddleware = require('../middlewares/auth.js')
 
 const router = express.Router()
 
-router.post('/', documentController.addDocument)
-router.get('/', documentController.getDocuments)
+router.post('/', authMiddleware.authenticateToken, documentController.addDocument)
+router.get('/', authMiddleware.authenticateToken,documentController.getDocuments)
 
 module.exports = router

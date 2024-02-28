@@ -1,13 +1,14 @@
 const express = require('express') 
 const patientController = require('../../controlles/patientController.js') 
+const authMiddleware = require('../middlewares/auth.js')
 
 const router = express.Router()
 
-router.post('/create', patientController.createPatient)
-router.get('/exportExcel', patientController.exportExcelPatientList)
-router.get('/lists', patientController.getAllPatients)
-router.get('/:id', patientController.getPatientsById)
-router.get('/:id/referral', patientController.getPatientReferralById)
+router.post('/create', authMiddleware.authenticateToken, patientController.createPatient)
+router.get('/exportExcel', authMiddleware.authenticateToken, patientController.exportExcelPatientList)
+router.get('/lists', authMiddleware.authenticateToken, patientController.getAllPatients)
+router.get('/:id', authMiddleware.authenticateToken, patientController.getPatientsById)
+router.get('/:id/referral', authMiddleware.authenticateToken, patientController.getPatientReferralById)
 
 
 module.exports = router
