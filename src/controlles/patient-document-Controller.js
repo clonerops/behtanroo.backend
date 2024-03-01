@@ -1,3 +1,4 @@
+const { Op } = require("sequelize")
 const Document = require("../models/document")
 const Patient = require("../models/patient")
 const PatientDocument = require("../models/patient_document")
@@ -41,7 +42,15 @@ const patientDocumentController = {
     },
 
     getPatientDocumnetById: async (req, res, next) => {
-        const patientDocument = await PatientDocument.findOne({where: {id: req.params.id}, include: Patient})
+        const patientDocument = await PatientDocument.findOne({
+            where: {
+                [Op.and]: [{
+                    patientId: req.params.patientId
+                },
+                {
+                    documentId: req.params.documentId
+                }],
+        }, include: [Patient]})
         return res.status(200).json({
             success: true,
             data: patientDocument

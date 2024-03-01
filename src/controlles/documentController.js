@@ -1,4 +1,6 @@
-const Document = require('../models/document')
+const Document = require('../models/document');
+const Patient = require('../models/patient');
+const Referral = require('../models/referral');
 
 const documentController = {
     addDocument: async (req, res, next) => {
@@ -20,7 +22,7 @@ const documentController = {
     },
 
     getDocument: async (req, res, next) => {
-        const document = await Document.findOne({ where: { id: req.params.id } })
+        const document = await Document.findOne({ where: { id: req.params.id }, include: [Patient, Referral] })
         return res.status(200).json({
             success: true,
             data: document

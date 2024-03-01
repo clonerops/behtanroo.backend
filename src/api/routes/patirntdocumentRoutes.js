@@ -6,6 +6,6 @@ const router = express.Router()
 
 router.post('/', authMiddleware.authenticateToken, patientDocumentController.createPatientDocument)
 router.get('/', authMiddleware.authenticateToken, patientDocumentController.listOfPatientDocument)
-router.get('/:id', authMiddleware.authenticateToken, patientDocumentController.getPatientDocumnetById)
+router.get('/patient/:patientId/document/:documentId', authMiddleware.authenticateToken, patientDocumentController.getPatientDocumnetById)
 
 module.exports = router
