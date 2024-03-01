@@ -18,7 +18,7 @@ const reportController = {
 
             const patientsResult = await PatientDocument.findAll({
                 where: {
-                    [documentId ? Op.and : Op.or]: [
+                    [documentId != 0 ? Op.and : Op.or]: [
                         {
                             createdAt: {
                                 [Op.between]: [utcFromDate, utcToDate]
@@ -26,7 +26,7 @@ const reportController = {
                         },
 
                         {
-                            documentId: documentId === undefined ? null : documentId
+                            documentId: documentId == 0 ? null : documentId
                         }
                     ]
 
@@ -54,7 +54,7 @@ const reportController = {
 
             const patientsResult = await PatientDocument.findAll({
                 where: {
-                    [documentId ? Op.and : Op.or]: [
+                    [documentId != 0 ? Op.and : Op.or]: [
                         {
                             createdAt: {
                                 [Op.between]: [utcFromDate, utcToDate]
@@ -62,7 +62,7 @@ const reportController = {
                         },
 
                         {
-                            documentId: documentId === undefined ? null : documentId
+                            documentId: documentId == 0 ? null : documentId
                         }
                     ]
 
@@ -154,18 +154,22 @@ const reportController = {
             const utcToDate = moment(toDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD 23:59:59');
     
             const patients = await Patient.findAll({
-                where: {
+                where: documentId != 0 ? {
                     [Op.and]: 
                     {
-                        '$documents.id$': documentId ? documentId : null,
+                        '$documents.id$': documentId != 0 ? documentId : null,
                     },
+                    createdAt: {
+                        [Op.between]: [utcFromDate, utcToDate]
+                    }
+                } : {
                     createdAt: {
                         [Op.between]: [utcFromDate, utcToDate]
                     }
                 },
                 group: ['patient.id'],
                 having: literal(`COUNT(referrals.id) BETWEEN ${fromCount} AND ${toCount}`),
-                include: [
+                include: documentId != 0 ? [
                     {
                         model: Referral,
                         attributes: []
@@ -174,9 +178,11 @@ const reportController = {
                         model: Document,
                         attributes: []
                     },
-                ],
+                ] :  {
+                    model: Referral,
+                    attributes: []
+                },
             })
-    
             return res.status(200).json({
                 message: true,
                 data: patients
@@ -197,18 +203,22 @@ const reportController = {
             const utcToDate = moment(toDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD 23:59:59');
     
             const patients = await Patient.findAll({
-                where: {
+                where: documentId != 0 ? {
                     [Op.and]: 
                     {
-                        '$documents.id$': documentId ? documentId : null,
+                        '$documents.id$': documentId != 0 ? documentId : null,
                     },
+                    createdAt: {
+                        [Op.between]: [utcFromDate, utcToDate]
+                    }
+                } : {
                     createdAt: {
                         [Op.between]: [utcFromDate, utcToDate]
                     }
                 },
                 group: ['patient.id'],
                 having: literal(`COUNT(referrals.id) BETWEEN ${fromCount} AND ${toCount}`),
-                include: [
+                include: documentId != 0 ?  [
                     {
                         model: Referral,
                         attributes: []
@@ -217,7 +227,10 @@ const reportController = {
                         model: Document,
                         attributes: []
                     },
-                ],
+                ] : {
+                    model: Referral,
+                    attributes: []
+                },
             })
     
             if (patients.length > 0) {
