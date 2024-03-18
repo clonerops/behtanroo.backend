@@ -220,20 +220,22 @@ const reportController = {
                     {
                         model: Referral,
                         attributes: [],
-                        required: true // Inner join
+                        required: false // Full join
 
                     },
                     {
                         model: Document,
-                        attributes: [],
-                        required: true // Inner join
+                        // attributes: [],
+                        required: false // Full join
 
                     },
-                ] :  {
-                    model: Referral,                
-                    attributes: [],
-                    required: true // Inner join
-                },
+                ] : [
+                    {
+                        model: Referral,                
+                        attributes: [],
+                        required: false // Full join
+                    },
+                ]
             })
             return res.status(200).json({
                 message: true,
