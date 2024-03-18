@@ -35,9 +35,9 @@ const reportController = {
                     { model: Document },
                 ]
             })
-
             patientsResult.forEach((item, index) => {
                 let mergedPatient = {
+                    id: item.patientId,
                     documentCode: item.documentCode,
                     firstName: item.patient.firstName,
                     lastName: item.patient.lastName,
@@ -48,7 +48,7 @@ const reportController = {
                     tel: item.patient.tel,
                     mobile2: item.patient.mobile2,
                     address: item.patient.address,
-                    document: item.document
+                    document: item.document,
                 };
                 patients.push(mergedPatient);
             })
@@ -219,15 +219,20 @@ const reportController = {
                 include: documentId != 0 ? [
                     {
                         model: Referral,
-                        attributes: []
+                        attributes: [],
+                        required: true // Inner join
+
                     },
                     {
                         model: Document,
-                        attributes: []
+                        attributes: [],
+                        required: true // Inner join
+
                     },
                 ] :  {
                     model: Referral,                
-                    attributes: []
+                    attributes: [],
+                    required: true // Inner join
                 },
             })
             return res.status(200).json({
@@ -269,16 +274,17 @@ const reportController = {
                 include: documentId != 0 ?  [
                     {
                         model: Referral,
+                        attributes: []
 
                     },
                     {
                         model: Document,
+                        attributes: []
 
                     },
                 ] : {
                     model: Referral,
-                    
-                    
+                    attributes: []
                 },
             })
     

@@ -62,7 +62,10 @@ const patientController = {
         try {
             const patient = await Patient.findOne({
                 where: { id: req.params.id },
-                include: Document
+                include: [
+                    {model: Document},
+                    {model: Referral},
+                ]
             })
             return res.status(200).json(patient)
 
