@@ -33,6 +33,19 @@ const patientController = {
             return error
         }
     },
+    editPatient: async (req, res, next) => {
+        try {
+            const { id, firstName, lastName, nationalCode, mobile, mobile2, tel, address, gender, description } = req.body;
+            const findPatient = await Patient.findOne({ where: { nationalCode: nationalCode } })
+
+           await findPatient.update({
+                firstName, lastName, nationalCode, mobile, mobile2, tel, address, gender, description
+            })
+            return res.status(200).json({message: true})
+        } catch (error) {
+            return error
+        }
+    },
 
     getAllPatients: async (req, res, next) => {
         try {
@@ -47,7 +60,8 @@ const patientController = {
 
     getPatientsById: async (req, res, next) => {
         try {
-            const patient = await Patient.findOne({ where: { id: req.params.id }, 
+            const patient = await Patient.findOne({
+                where: { id: req.params.id },
                 include: Document
             })
             return res.status(200).json(patient)
@@ -59,9 +73,11 @@ const patientController = {
 
     getPatientReferralById: async (req, res, next) => {
         try {
-            const patient = await Patient.findOne({ where: { id: req.params.id }, 
-                
-            include: Referral })
+            const patient = await Patient.findOne({
+                where: { id: req.params.id },
+
+                include: Referral
+            })
             return res.status(200).json(patient)
 
         } catch (error) {
@@ -76,15 +92,15 @@ const patientController = {
             let workSheet = new exceljs.Workbook()
             const sheet = workSheet.addWorksheet("patients")
             sheet.columns = [
-                {header: "شماره بیمار", key: 'patientCode', width: 12, },
-                {header: "نام", key: 'firstName', width: 16},
-                {header: "نام خانوادگی", key: 'lastName', width: 18},
-                {header: "کدملی", key: 'nationalCode', width: 16},
-                {header: "تلفن همراه", key: 'mobile', width: 16},
-                {header: "تلفن همراه ضروری", key: 'mobile2', width: 16},
-                {header: "تلفن منزل", key: 'tel', width: 16},
-                {header: "جنسیت", key: 'gender', width: 4},
-                {header: "آدرس", key: 'address', width: 16},
+                { header: "شماره بیمار", key: 'patientCode', width: 12, },
+                { header: "نام", key: 'firstName', width: 16 },
+                { header: "نام خانوادگی", key: 'lastName', width: 18 },
+                { header: "کدملی", key: 'nationalCode', width: 16 },
+                { header: "تلفن همراه", key: 'mobile', width: 16 },
+                { header: "تلفن همراه ضروری", key: 'mobile2', width: 16 },
+                { header: "تلفن منزل", key: 'tel', width: 16 },
+                { header: "جنسیت", key: 'gender', width: 4 },
+                { header: "آدرس", key: 'address', width: 16 },
             ]
             sheet.getColumn('patientCode').eachCell({ includeEmpty: true }, cell => {
                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };

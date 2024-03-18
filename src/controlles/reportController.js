@@ -30,9 +30,28 @@ const reportController = {
                         }
                     ]
 
-                }, include: { model: Patient }
+                }, include: [
+                    { model: Patient },
+                    { model: Document },
+                ]
             })
-            patientsResult.forEach((item, index) => patients.push(item.patient))
+
+            patientsResult.forEach((item, index) => {
+                let mergedPatient = {
+                    documentCode: item.documentCode,
+                    firstName: item.patient.firstName,
+                    lastName: item.patient.lastName,
+                    patientCode: item.patient.patientCode,
+                    gender: item.patient.gender,
+                    nationalCode: item.patient.nationalCode,
+                    mobile: item.patient.mobile,
+                    tel: item.patient.tel,
+                    mobile2: item.patient.mobile2,
+                    address: item.patient.address,
+                    document: item.document
+                };
+                patients.push(mergedPatient);
+            })
             res.status(200).json({
                 message: true,
                 data: patients
@@ -66,15 +85,35 @@ const reportController = {
                         }
                     ]
 
-                }, include: { model: Patient }
+                }, include:[
+                    { model: Patient },
+                    { model: Document },
+                ]
             })
-            patientsResult.forEach((item, index) => patients.push(item.patient))
+            patientsResult.forEach((item, index) => {
+                let mergedPatient = {
+                    documentCode: item.documentCode,
+                    firstName: item.patient.firstName,
+                    lastName: item.patient.lastName,
+                    patientCode: item.patient.patientCode,
+                    gender: item.patient.gender,
+                    nationalCode: item.patient.nationalCode,
+                    mobile: item.patient.mobile,
+                    tel: item.patient.tel,
+                    mobile2: item.patient.mobile2,
+                    address: item.patient.address,
+                    title: item.document.title
+                };
+                patients.push(mergedPatient);
+            })
 
             if (patients.length > 0) {
                 let workSheet = new exceljs.Workbook()
                 const sheet = workSheet.addWorksheet("patients")
                 sheet.columns = [
                     { header: "شماره بیمار", key: 'patientCode', width: 12, },
+                    { header: "شماره پرونده", key: 'documentCode', width: 12, },
+                    { header: "نوع پرونده", key: 'title', width: 12, },
                     { header: "نام", key: 'firstName', width: 16 },
                     { header: "نام خانوادگی", key: 'lastName', width: 18 },
                     { header: "کدملی", key: 'nationalCode', width: 16 },
@@ -85,6 +124,12 @@ const reportController = {
                     { header: "آدرس", key: 'address', width: 16 },
                 ]
                 sheet.getColumn('patientCode').eachCell({ includeEmpty: true }, cell => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+                });
+                sheet.getColumn('documentCode').eachCell({ includeEmpty: true }, cell => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+                });
+                sheet.getColumn('title').eachCell({ includeEmpty: true }, cell => {
                     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
                 });
                 sheet.getColumn('firstName').eachCell({ includeEmpty: true }, cell => {
@@ -115,6 +160,8 @@ const reportController = {
                 patients.map((value, index) => {
                     sheet.addRow({
                         patientCode: value.patientCode,
+                        documentCode: value.documentCode,
+                        title: value.title,
                         firstName: value.firstName,
                         lastName: value.lastName,
                         nationalCode: value.nationalCode,
@@ -179,7 +226,7 @@ const reportController = {
                         attributes: []
                     },
                 ] :  {
-                    model: Referral,
+                    model: Referral,                
                     attributes: []
                 },
             })
@@ -188,6 +235,7 @@ const reportController = {
                 data: patients
             });    
         } catch (error) {
+            console.log(error)
             return res.status(500).json({
                 message: "server is error",
             });    
@@ -221,15 +269,16 @@ const reportController = {
                 include: documentId != 0 ?  [
                     {
                         model: Referral,
-                        attributes: []
+
                     },
                     {
                         model: Document,
-                        attributes: []
+
                     },
                 ] : {
                     model: Referral,
-                    attributes: []
+                    
+                    
                 },
             })
     
