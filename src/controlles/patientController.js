@@ -6,7 +6,21 @@ const exceljs = require('exceljs')
 const patientController = {
     createPatient: async (req, res, next) => {
         try {
-            const { firstName, lastName, nationalCode, mobile, mobile2, tel, address, gender, description } = req.body;
+            const { 
+                firstName, 
+                lastName, 
+                nationalCode, 
+                mobile, 
+                mobile2, 
+                tel, 
+                address, 
+                gender,
+                birthDate,
+                job,
+                education,
+                representative,
+                maritalStatus,
+                description } = req.body;
             const isExist = await Patient.findOne({ where: { nationalCode: nationalCode } })
             if (isExist) {
                 return res.status(400).json({
@@ -23,6 +37,11 @@ const patientController = {
                     tel,
                     address,
                     gender,
+                    birthDate,
+                    job,
+                    education,
+                    representative,
+                    maritalStatus,    
                     description,
                     patientCode: Math.floor(Math.random() * 1000000)
                 })
@@ -35,11 +54,40 @@ const patientController = {
     },
     editPatient: async (req, res, next) => {
         try {
-            const { id, firstName, lastName, nationalCode, mobile, mobile2, tel, address, gender, description } = req.body;
+            const { 
+                id, 
+                firstName, 
+                lastName, 
+                nationalCode, 
+                mobile, 
+                mobile2, 
+                tel, 
+                address, 
+                gender,
+                birthDate,
+                job,
+                education,
+                representative,
+                maritalStatus, 
+                description
+             } = req.body;
             const findPatient = await Patient.findOne({ where: { nationalCode: nationalCode } })
 
            await findPatient.update({
-                firstName, lastName, nationalCode, mobile, mobile2, tel, address, gender, description
+                firstName, 
+                lastName, 
+                nationalCode, 
+                mobile, 
+                mobile2, 
+                tel, 
+                address, 
+                gender,
+                birthDate,
+                job,
+                education,
+                representative,
+                maritalStatus, 
+                description
             })
             return res.status(200).json({message: true})
         } catch (error) {
@@ -52,7 +100,6 @@ const patientController = {
 
             const patients = await Patient.findAll({ include: { model: Referral } })
             return res.status(200).json(patients)
-
         } catch (error) {
             console.log(error)
         }
@@ -103,6 +150,11 @@ const patientController = {
                 { header: "تلفن همراه ضروری", key: 'mobile2', width: 16 },
                 { header: "تلفن منزل", key: 'tel', width: 16 },
                 { header: "جنسیت", key: 'gender', width: 4 },
+                { header: "تاریخ تولد", key: 'birthDate', width: 16 },
+                { header: "شغل", key: 'job', width: 16 },
+                { header: "تحصیلات", key: 'education', width: 16 },
+                { header: "معرف", key: 'representative', width: 16 },
+                { header: "وضعیت تاهل", key: 'maritalStatus', width: 16 },
                 { header: "آدرس", key: 'address', width: 16 },
             ]
             sheet.getColumn('patientCode').eachCell({ includeEmpty: true }, cell => {
@@ -129,6 +181,21 @@ const patientController = {
             sheet.getColumn('gender').eachCell({ includeEmpty: true }, cell => {
                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
             });
+            sheet.getColumn('birthDate').eachCell({ includeEmpty: true }, cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+            });
+            sheet.getColumn('job').eachCell({ includeEmpty: true }, cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+            });
+            sheet.getColumn('education').eachCell({ includeEmpty: true }, cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+            });
+            sheet.getColumn('representative').eachCell({ includeEmpty: true }, cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+            });
+            sheet.getColumn('maritalStatus').eachCell({ includeEmpty: true }, cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+            });
             sheet.getColumn('address').eachCell({ includeEmpty: true }, cell => {
                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
             });
@@ -143,6 +210,11 @@ const patientController = {
                     mobile2: value.mobile2,
                     tel: value.tel,
                     gender: value.gender,
+                    birthDate: value.birthDate,
+                    job: value.job,
+                    education: value.education,
+                    representative: value.representative,
+                    maritalStatus: value.maritalStatus,
                     address: value.address,
                 })
             })
