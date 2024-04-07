@@ -98,6 +98,44 @@ const patientDocumentController = {
         } catch (error) {
             return res.status(500).json({ message: "Server Error" })
         }
+    },
+    uploadFile: async (req, res, next) => {
+        try {
+            const { patientId, documentId } = req.body
+            console.log(patientId)
+
+            const patientDocument = await PatientDocument.findOne({
+                where: {
+                    [Op.and]: [{
+                        patientId: patientId
+                    },
+                    {
+                        documentId: documentId
+                    }],
+                }
+            })
+    
+            if(!patientDocument) {
+                return res.status(400).json({
+                    message: 'پرونده برای  بیمار یافت نشد'
+                })
+            }
+    
+            if(req.file == undefined){
+                return res.status(400).json({
+                    message: 'خطا در آپلود فایل!'
+                })
+            }
+    
+            await patientDocument.update({
+                image: req.file.path
+            })
+            return res.status(200).json({message: true})
+    
+        } catch (error) {
+            console.log(error)
+            return error
+        }
     }
 }
 

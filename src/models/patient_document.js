@@ -9,7 +9,12 @@ const PatientDocument = sequelize.define('PatientDocument', {
     },
     documentCode: {
         type: DataTypes.INTEGER,
-    }
+    },
+    image: {
+        type: DataTypes.STRING,
+        default: 'no-image.png'
+    },
+
 }, {
     hooks: {
         beforeCreate: async (patientDocument, options) => {
