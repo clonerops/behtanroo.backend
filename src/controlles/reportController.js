@@ -30,9 +30,28 @@ const reportController = {
                         }
                     ]
 
-                }, include: { model: Patient }
+                }, include: [
+                    { model: Patient },
+                    { model: Document },
+                ]
             })
-            patientsResult.forEach((item, index) => patients.push(item.patient))
+            patientsResult.forEach((item, index) => {
+                let mergedPatient = {
+                    id: item.patientId,
+                    documentCode: item.documentCode,
+                    firstName: item.patient.firstName,
+                    lastName: item.patient.lastName,
+                    patientCode: item.patient.patientCode,
+                    gender: item.patient.gender,
+                    nationalCode: item.patient.nationalCode,
+                    mobile: item.patient.mobile,
+                    tel: item.patient.tel,
+                    mobile2: item.patient.mobile2,
+                    address: item.patient.address,
+                    document: item.document,
+                };
+                patients.push(mergedPatient);
+            })
             res.status(200).json({
                 message: true,
                 data: patients
@@ -66,15 +85,35 @@ const reportController = {
                         }
                     ]
 
-                }, include: { model: Patient }
+                }, include: [
+                    { model: Patient },
+                    { model: Document },
+                ]
             })
-            patientsResult.forEach((item, index) => patients.push(item.patient))
+            patientsResult.forEach((item, index) => {
+                let mergedPatient = {
+                    documentCode: item.documentCode,
+                    firstName: item.patient.firstName,
+                    lastName: item.patient.lastName,
+                    patientCode: item.patient.patientCode,
+                    gender: item.patient.gender,
+                    nationalCode: item.patient.nationalCode,
+                    mobile: item.patient.mobile,
+                    tel: item.patient.tel,
+                    mobile2: item.patient.mobile2,
+                    address: item.patient.address,
+                    title: item.document.title
+                };
+                patients.push(mergedPatient);
+            })
 
             if (patients.length > 0) {
                 let workSheet = new exceljs.Workbook()
                 const sheet = workSheet.addWorksheet("patients")
                 sheet.columns = [
                     { header: "شماره بیمار", key: 'patientCode', width: 12, },
+                    { header: "شماره پرونده", key: 'documentCode', width: 12, },
+                    { header: "نوع پرونده", key: 'title', width: 12, },
                     { header: "نام", key: 'firstName', width: 16 },
                     { header: "نام خانوادگی", key: 'lastName', width: 18 },
                     { header: "کدملی", key: 'nationalCode', width: 16 },
@@ -85,6 +124,12 @@ const reportController = {
                     { header: "آدرس", key: 'address', width: 16 },
                 ]
                 sheet.getColumn('patientCode').eachCell({ includeEmpty: true }, cell => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+                });
+                sheet.getColumn('documentCode').eachCell({ includeEmpty: true }, cell => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+                });
+                sheet.getColumn('title').eachCell({ includeEmpty: true }, cell => {
                     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
                 });
                 sheet.getColumn('firstName').eachCell({ includeEmpty: true }, cell => {
@@ -115,6 +160,8 @@ const reportController = {
                 patients.map((value, index) => {
                     sheet.addRow({
                         patientCode: value.patientCode,
+                        documentCode: value.documentCode,
+                        title: value.title,
                         firstName: value.firstName,
                         lastName: value.lastName,
                         nationalCode: value.nationalCode,
@@ -152,13 +199,47 @@ const reportController = {
             const { documentId, fromDate, toDate, fromCount, toCount } = req.query;
             const utcFromDate = moment(fromDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD 23:59:59');
             const utcToDate = moment(toDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD 23:59:59');
-    
-            const patients = await Patient.findAll({
+
+            // const patients = await Patient.findAll({
+            //     where: documentId != 0 ? {
+            //         [Op.and]: 
+            //         {
+            //             '$documents.id$': documentId != 0 ? documentId : null,
+            //         },
+            //         createdAt: {
+            //             [Op.between]: [utcFromDate, utcToDate]
+            //         }
+            //     } : {
+            //         createdAt: {
+            //             [Op.between]: [utcFromDate, utcToDate]
+            //         }
+            //     },
+            //     group: ['patient.id'],
+            //     having: literal(`COUNT(referrals.id) BETWEEN ${fromCount} AND ${toCount}`),
+            //     include: documentId != 0 ? [
+            //         {
+            //             model: Referral,
+            //             attributes: [],
+            //             required: false // Full join
+
+            //         },
+            //         {
+            //             model: Document,
+            //             // attributes: [],
+            //             required: false // Full join
+
+            //         },
+            //     ] : [
+            //         {
+            //             model: Referral,                
+            //             attributes: [],
+            //             required: false // Full join
+            //         },
+            //     ]
+            // })
+            const patients = await PatientDocument.findAll({
                 where: documentId != 0 ? {
-                    [Op.and]: 
-                    {
-                        '$documents.id$': documentId != 0 ? documentId : null,
-                    },
+                    documentId: documentId,
                     createdAt: {
                         [Op.between]: [utcFromDate, utcToDate]
                     }
@@ -167,30 +248,35 @@ const reportController = {
                         [Op.between]: [utcFromDate, utcToDate]
                     }
                 },
-                group: ['patient.id'],
-                having: literal(`COUNT(referrals.id) BETWEEN ${fromCount} AND ${toCount}`),
-                include: documentId != 0 ? [
+                include: [
+                    { model: Document },
                     {
-                        model: Referral,
-                        attributes: []
-                    },
-                    {
-                        model: Document,
-                        attributes: []
-                    },
-                ] :  {
-                    model: Referral,
-                    attributes: []
-                },
+                        model: Patient,
+                        required: false,
+                        include: [
+                            {
+                                model: Referral,
+                            }
+                        ]
+                    }
+                ]
             })
+
+            // Filter patients based on the count of referrals
+            const filteredPatients = patients.filter(patientDocument => {
+                const referralCount = patientDocument.patient.referrals.length;
+                return referralCount >= fromCount && referralCount <= toCount;
+            });
+
             return res.status(200).json({
                 message: true,
-                data: patients
-            });    
+                data: filteredPatients
+            });
         } catch (error) {
+            console.log(error)
             return res.status(500).json({
                 message: "server is error",
-            });    
+            });
 
         }
     },
@@ -201,13 +287,43 @@ const reportController = {
 
             const utcFromDate = moment(fromDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD 23:59:59');
             const utcToDate = moment(toDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD 23:59:59');
-    
-            const patients = await Patient.findAll({
+
+            // const patients = await Patient.findAll({
+            //     where: documentId != 0 ? {
+            //         [Op.and]:
+            //         {
+            //             '$documents.id$': documentId != 0 ? documentId : null,
+            //         },
+            //         createdAt: {
+            //             [Op.between]: [utcFromDate, utcToDate]
+            //         }
+            //     } : {
+            //         createdAt: {
+            //             [Op.between]: [utcFromDate, utcToDate]
+            //         }
+            //     },
+            //     group: ['patient.id'],
+            //     having: literal(`COUNT(referrals.id) BETWEEN ${fromCount} AND ${toCount}`),
+            //     include: documentId != 0 ? [
+            //         {
+            //             model: Referral,
+            //             attributes: []
+
+            //         },
+            //         {
+            //             model: Document,
+            //             attributes: []
+
+            //         },
+            //     ] : {
+            //         model: Referral,
+            //         attributes: []
+            //     },
+            // })
+
+            const patients = await PatientDocument.findAll({
                 where: documentId != 0 ? {
-                    [Op.and]: 
-                    {
-                        '$documents.id$': documentId != 0 ? documentId : null,
-                    },
+                    documentId: documentId,
                     createdAt: {
                         [Op.between]: [utcFromDate, utcToDate]
                     }
@@ -216,28 +332,35 @@ const reportController = {
                         [Op.between]: [utcFromDate, utcToDate]
                     }
                 },
-                group: ['patient.id'],
-                having: literal(`COUNT(referrals.id) BETWEEN ${fromCount} AND ${toCount}`),
-                include: documentId != 0 ?  [
+                include: [
+                    { model: Document },
                     {
-                        model: Referral,
-                        attributes: []
-                    },
-                    {
-                        model: Document,
-                        attributes: []
-                    },
-                ] : {
-                    model: Referral,
-                    attributes: []
-                },
+                        model: Patient,
+                        required: false,
+                        include: [
+                            {
+                                model: Referral,
+                            }
+                        ]
+                    }
+                ]
             })
-    
-            if (patients.length > 0) {
+
+            // Filter patients based on the count of referrals
+            const filteredPatients = patients.filter(patientDocument => {
+                const referralCount = patientDocument.patient.referrals.length;
+                return referralCount >= fromCount && referralCount <= toCount;
+            });
+
+
+
+            if (filteredPatients.length > 0) {
                 let workSheet = new exceljs.Workbook()
                 const sheet = workSheet.addWorksheet("patients")
                 sheet.columns = [
                     { header: "شماره بیمار", key: 'patientCode', width: 12, },
+                    { header: "شماره پرونده", key: 'documentCode', width: 12, },
+                    { header: "نوع پرونده", key: 'title', width: 12, },
                     { header: "نام", key: 'firstName', width: 16 },
                     { header: "نام خانوادگی", key: 'lastName', width: 18 },
                     { header: "کدملی", key: 'nationalCode', width: 16 },
@@ -248,6 +371,12 @@ const reportController = {
                     { header: "آدرس", key: 'address', width: 16 },
                 ]
                 sheet.getColumn('patientCode').eachCell({ includeEmpty: true }, cell => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+                });
+                sheet.getColumn('documentCode').eachCell({ includeEmpty: true }, cell => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
+                });
+                sheet.getColumn('title').eachCell({ includeEmpty: true }, cell => {
                     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
                 });
                 sheet.getColumn('firstName').eachCell({ includeEmpty: true }, cell => {
@@ -274,18 +403,21 @@ const reportController = {
                 sheet.getColumn('address').eachCell({ includeEmpty: true }, cell => {
                     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '69F080' } };
                 });
-    
-                patients.map((value, index) => {
+
+                filteredPatients.map((value, index) => {
                     sheet.addRow({
-                        patientCode: value.patientCode,
-                        firstName: value.firstName,
-                        lastName: value.lastName,
-                        nationalCode: value.nationalCode,
-                        mobile: value.mobile,
-                        mobile2: value.mobile2,
-                        tel: value.tel,
-                        gender: value.gender,
-                        address: value.address,
+                        documentCode: value.documentCode,
+                        patientCode: value.patient.patientCode,
+                        firstName: value.patient.firstName,
+                        lastName: value.patient.lastName,
+                        nationalCode: value.patient.nationalCode,
+                        mobile: value.patient.mobile,
+                        mobile2: value.patient.mobile2,
+                        tel: value.patient.tel,
+                        gender: value.patient.gender,
+                        address: value.patient.address,
+                        title: value.document.title
+
                     })
                 })
                 res.setHeader(
@@ -303,11 +435,11 @@ const reportController = {
                     message: "داده ای برای نمایش وجود ندارد"
                 })
             }
-        
+
         } catch (error) {
             return res.status(500).json({
                 message: "server is error",
-            });    
+            });
         }
     }
 };

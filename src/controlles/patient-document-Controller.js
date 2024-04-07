@@ -5,19 +5,28 @@ const PatientDocument = require("../models/patient_document")
 
 const patientDocumentController = {
     createPatientDocument: async (req, res, next) => {
-        const { documentId, patientId, description } = req.body
+        try {
+            const { documentId, patientId, description } = req.body
 
-        const result = await PatientDocument.create({
-            documentId,
-            patientId,
-            description,
-            documentCode: Math.floor(Math.random() * 1000000)
-        })
-
-        return res.status(201).json({
-            success: true,
-            data: result
-        })
+            const result = await PatientDocument.create({
+                documentId,
+                patientId,
+                description,
+                documentCode: Math.floor(Math.random() * 1000000)
+            })
+    
+            return res.status(201).json({
+                success: true,
+                data: result
+            })
+    
+        } catch (error) {
+            return res.status(500).json({
+                success: true,
+                data: error
+            })
+          
+        }
     },
 
     listOfPatientDocument: async (req, res, next) => {

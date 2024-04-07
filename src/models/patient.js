@@ -38,6 +38,26 @@ const Patient = sequelize.define("patient",{
         type: DataTypes.SMALLINT
     },
 
+    birthDate: {
+        type: DataTypes.STRING
+    },
+
+    job: {
+        type: DataTypes.STRING
+    },
+
+    education: {
+        type: DataTypes.STRING
+    },
+
+    representative: {
+        type: DataTypes.STRING
+    },
+
+    maritalStatus: {
+        type: DataTypes.SMALLINT
+    },
+    
     description: {
         type: DataTypes.TEXT
     },
@@ -45,6 +65,7 @@ const Patient = sequelize.define("patient",{
     patientCode: {
         type: DataTypes.INTEGER,
     },
+
 }, {
     hooks: {
         beforeCreate: (patient, options) => {
