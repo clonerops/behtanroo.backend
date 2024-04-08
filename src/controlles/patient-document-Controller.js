@@ -2,6 +2,8 @@ const { Op } = require("sequelize")
 const Document = require("../models/document")
 const Patient = require("../models/patient")
 const PatientDocument = require("../models/patient_document")
+const  base64_encode  = require("../api/middlewares/convertFileToBase64")
+const Attachment = require("../models/attachment")
 
 const patientDocumentController = {
     createPatientDocument: async (req, res, next) => {
@@ -102,9 +104,8 @@ const patientDocumentController = {
     uploadFile: async (req, res, next) => {
         try {
             const { patientId, documentId } = req.body
-            console.log(patientId)
 
-            const patientDocument = await PatientDocument.findOne({
+            const findAttach = await Attachment.findAll({
                 where: {
                     [Op.and]: [{
                         patientId: patientId
@@ -113,24 +114,34 @@ const patientDocumentController = {
                         documentId: documentId
                     }],
                 }
-            })
-    
-            if(!patientDocument) {
-                return res.status(400).json({
-                    message: 'پرونده برای  بیمار یافت نشد'
-                })
-            }
-    
-            if(req.file == undefined){
+            });
+                    
+            if(findAttach.length > 2) {
                 return res.status(400).json({
                     message: 'خطا در آپلود فایل!'
                 })
+ 
+            } else {
+                if(req.files.length > 1) {
+                    req.files.map((item) => {
+                        Attachment.create({
+                            patientId,
+                            documentId,
+                            attachment: base64_encode(item.path)
+                        });
+                    }
+                )
+                    return res.status(200).json({ message: true });
+                } else {
+                    await Attachment.create({
+                    patientId,
+                    documentId,
+                    attachment: base64_encode(req.files[0].path)
+                });
+                return res.status(200).json({ message: true });
+
+                }        
             }
-    
-            await patientDocument.update({
-                image: req.file.path
-            })
-            return res.status(200).json({message: true})
     
         } catch (error) {
             console.log(error)

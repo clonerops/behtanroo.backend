@@ -9,6 +9,6 @@ router.post('/', authMiddleware.authenticateToken, patientDocumentController.cre
 router.get('/', authMiddleware.authenticateToken, patientDocumentController.listOfPatientDocument)
 router.get('/patient/:patientId/document/:documentId', authMiddleware.authenticateToken, patientDocumentController.getPatientDocumnetById)
 router.delete('/patient/:patientId/document/:documentId', authMiddleware.authenticateToken, patientDocumentController.deletePatientDocument)
-router.put('/uploadFile', authMiddleware.authenticateToken, uploadFile.single('image'), patientDocumentController.uploadFile)
+router.put('/uploadFile', authMiddleware.authenticateToken, uploadFile.array('attachment', 2), patientDocumentController.uploadFile)
 
 module.exports = router

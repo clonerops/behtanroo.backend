@@ -2,6 +2,7 @@ const { DataTypes } = require("sequelize");
 const Patient = require("./patient");
 const Document = require("./document");
 const sequelize =  require('../database/connection');
+const Attachment = require("./attachment");
 
 const PatientDocument = sequelize.define('PatientDocument', {
     description: {
@@ -9,10 +10,6 @@ const PatientDocument = sequelize.define('PatientDocument', {
     },
     documentCode: {
         type: DataTypes.INTEGER,
-    },
-    image: {
-        type: DataTypes.STRING,
-        default: 'no-image.png'
     },
 
 }, {
@@ -37,5 +34,7 @@ Patient.belongsToMany(Document, { through: PatientDocument });
 Document.belongsToMany(Patient, { through: PatientDocument });
 PatientDocument.belongsTo(Patient)
 PatientDocument.belongsTo(Document)
+Patient.hasMany(Attachment)
+Document.hasMany(Attachment)
 
 module.exports = PatientDocument
