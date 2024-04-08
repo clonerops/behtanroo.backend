@@ -42,7 +42,7 @@ const patientDocumentController = {
                     model: Document,
                     attributes: ['id', 'title']
 
-                }
+                },
             ]
         })
         return res.status(200).json({
@@ -61,7 +61,23 @@ const patientDocumentController = {
                 {
                     documentId: req.params.documentId
                 }],
-            }, include: [Patient]
+            }, 
+            // include: [Patient]
+            include: [
+                {
+                    model: Patient,
+                },
+                {
+                    model: Document,
+                    attributes: ['id', 'title']
+
+                },
+                {
+                    model: Attachment,
+                    attributes: ['attachment']
+                }
+            ]
+
         })
         return res.status(200).json({
             success: true,

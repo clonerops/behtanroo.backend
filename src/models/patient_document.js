@@ -30,11 +30,19 @@ const PatientDocument = sequelize.define('PatientDocument', {
     }
 });
 
+// Patient.belongsToMany(Document, { through: PatientDocument });
+// Document.belongsToMany(Patient, { through: PatientDocument });
+// PatientDocument.belongsTo(Patient)
+// PatientDocument.belongsTo(Document)
+// Patient.belongsToMany(Attachment, { through: PatientDocument })
+// Document.belongsToMany(Attachment, { through: PatientDocument })
+
+PatientDocument.belongsTo(Patient);
+PatientDocument.belongsTo(Document);
+PatientDocument.belongsTo(Attachment);
 Patient.belongsToMany(Document, { through: PatientDocument });
 Document.belongsToMany(Patient, { through: PatientDocument });
-PatientDocument.belongsTo(Patient)
-PatientDocument.belongsTo(Document)
-Patient.hasMany(Attachment)
-Document.hasMany(Attachment)
+Patient.belongsToMany(Attachment, { through: PatientDocument });
+Document.belongsToMany(Attachment, { through: PatientDocument });
 
 module.exports = PatientDocument
