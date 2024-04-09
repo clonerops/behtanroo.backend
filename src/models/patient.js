@@ -3,6 +3,7 @@ const { DataTypes } =  require('sequelize')
 const Referral =  require('./referral')
 const sequelize =  require('../database/connection');
 const Document = require('./document');
+const Attachment = require('./attachment');
 
 
 const Patient = sequelize.define("patient",{
@@ -79,6 +80,7 @@ const Patient = sequelize.define("patient",{
 })
 
 Patient.hasMany(Referral)
+// Patient.hasMany(Attachment)
 
 
 module.exports = Patient

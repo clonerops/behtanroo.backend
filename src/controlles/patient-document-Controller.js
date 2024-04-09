@@ -72,16 +72,38 @@ const patientDocumentController = {
                     attributes: ['id', 'title']
 
                 },
-                {
-                    model: Attachment,
-                    attributes: ['attachment']
-                }
             ]
 
         })
+
+        const findAttachements = await Attachment.findAll({
+            where: {
+                [Op.and]: [{
+                    patientId: req.params.patientId
+                },
+                {
+                    documentId: req.params.documentId
+                }],
+            }, 
+        })
         return res.status(200).json({
             success: true,
-            data: patientDocument
+            data: {
+                document: {
+                    id: patientDocument?.document.id,  
+                    title: patientDocument?.document.title,  
+                },
+                patient: {
+                    id: patientDocument?.patient.id,  
+                    address: patientDocument?.patient.address,  
+                    firstName: patientDocument?.patient.firstName,  
+                    lastName: patientDocument?.patient.lastName,  
+                    mobile: patientDocument?.patient.mobile,  
+                    nationalCode: patientDocument?.patient.nationalCode,  
+                    patientCode: patientDocument?.patient.patientCode,  
+                },
+                attachments: findAttachements
+            },
         })
     },
 
@@ -117,11 +139,62 @@ const patientDocumentController = {
             return res.status(500).json({ message: "Server Error" })
         }
     },
+    
+    // uploadFile: async (req, res, next) => {
+    //     try {
+    //         const { patientId, documentId } = req.body
+
+    //         const findAttach = await Attachment.findAll({
+    //             where: {
+    //                 [Op.and]: [{
+    //                     patientId: patientId
+    //                 },
+    //                 {
+    //                     documentId: documentId
+    //                 }],
+    //             }
+    //         });
+
+    //         console.log(findAttach)
+                    
+    //         if(findAttach.length > 2) {
+    //             return res.status(400).json({
+    //                 message: 'خطا در آپلود فایل!'
+    //             })
+ 
+    //         } else {
+    //             if(req.files.length > 1) {
+    //                 req.files.map((item) => {
+    //                     Attachment.create({
+    //                         patientId,
+    //                         documentId,
+    //                         attachment: base64_encode(item.path)
+    //                     });
+    //                 }
+    //             )
+    //                 return res.status(200).json({ message: true });
+    //             } else {
+    //                 await Attachment.create({
+    //                 patientId,
+    //                 documentId,
+    //                 attachment: base64_encode(req.files[0].path)
+    //             });
+    //             return res.status(200).json({ message: true });
+
+    //             }        
+    //         }
+    
+    //     } catch (error) {
+    //         console.log(error)
+    //         return error
+    //     }
+    // }
+
     uploadFile: async (req, res, next) => {
         try {
             const { patientId, documentId } = req.body
-
-            const findAttach = await Attachment.findAll({
+    
+            const existingAttachment = await Attachment.findOne({
                 where: {
                     [Op.and]: [{
                         patientId: patientId
@@ -131,39 +204,56 @@ const patientDocumentController = {
                     }],
                 }
             });
-                    
-            if(findAttach.length > 2) {
-                return res.status(400).json({
-                    message: 'خطا در آپلود فایل!'
-                })
- 
-            } else {
-                if(req.files.length > 1) {
-                    req.files.map((item) => {
-                        Attachment.create({
-                            patientId,
-                            documentId,
-                            attachment: base64_encode(item.path)
+    
+            if (existingAttachment) {
+                // Update existing attachment
+                if (req.files && req.files.length > 0) {
+                    if (req.files.length > 1) {
+                        req.files.forEach(async (item) => {
+                            await existingAttachment.update({
+                                attachment: base64_encode(item.path)
+                            });
+                        });
+                    } else {
+                        await existingAttachment.update({
+                            attachment: base64_encode(req.files[0].path)
                         });
                     }
-                )
-                    return res.status(200).json({ message: true });
                 } else {
-                    await Attachment.create({
-                    patientId,
-                    documentId,
-                    attachment: base64_encode(req.files[0].path)
-                });
-                return res.status(200).json({ message: true });
-
-                }        
+                    // Handle delete attachment
+                    await existingAttachment.destroy();
+                }
+                return res.status(200).json({ message: "Attachment updated successfully" });
+            } else {
+                // Create new attachment
+                if (req.files && req.files.length > 0) {
+                    if (req.files.length > 1) {
+                        req.files.forEach(async (item) => {
+                            await Attachment.create({
+                                patientId,
+                                documentId,
+                                attachment: base64_encode(item.path)
+                            });
+                        });
+                    } else {
+                        await Attachment.create({
+                            patientId,
+                            documentId,
+                            attachment: base64_encode(req.files[0].path)
+                        });
+                    }
+                    return res.status(200).json({ message: "Attachment created successfully" });
+                } else {
+                    return res.status(400).json({ message: "No file provided" });
+                }
             }
-    
+        
         } catch (error) {
-            console.log(error)
-            return error
+            console.log(error);
+            return res.status(500).json({ message: "Internal server error" });
         }
     }
+    
 }
 
 module.exports = patientDocumentController
