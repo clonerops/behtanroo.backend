@@ -197,62 +197,93 @@ const patientDocumentController = {
     //     }
     // }
 
+    // uploadFile: async (req, res, next) => {
+    //     try {
+    //         const { patientId, documentId } = req.body
+    
+    //         const existingAttachment = await Attachment.findOne({
+    //             where: {
+    //                 [Op.and]: [{
+    //                     patientId: patientId
+    //                 },
+    //                 {
+    //                     documentId: documentId
+    //                 }],
+    //             }
+    //         });
+    
+    //         if (existingAttachment) {
+    //             // Update existing attachment
+    //             if (req.files && req.files.length > 0) {
+    //                 if (req.files.length > 1) {
+    //                     req.files.forEach(async (item) => {
+    //                         await existingAttachment.update({
+    //                             attachment: base64_encode(item.path)
+    //                         });
+    //                     });
+    //                 } else {
+    //                     await existingAttachment.update({
+    //                         attachment: base64_encode(req.files[0].path)
+    //                     });
+    //                 }
+    //             } else {
+    //                 // Handle delete attachment
+    //                 await existingAttachment.destroy();
+    //             }
+    //             return res.status(200).json({ message: "Attachment updated successfully" });
+    //         } else {
+    //             // Create new attachment
+    //             if (req.files && req.files.length > 0) {
+    //                 if (req.files.length > 1) {
+    //                     req.files.forEach(async (item) => {
+    //                         await Attachment.create({
+    //                             patientId,
+    //                             documentId,
+    //                             attachment: base64_encode(item.path)
+    //                         });
+    //                     });
+    //                 } else {
+    //                     await Attachment.create({
+    //                         patientId,
+    //                         documentId,
+    //                         attachment: base64_encode(req.files[0].path)
+    //                     });
+    //                 }
+    //                 return res.status(200).json({ message: "Attachment created successfully" });
+    //             } else {
+    //                 return res.status(400).json({ message: "No file provided" });
+    //             }
+    //         }
+        
+    //     } catch (error) {
+    //         console.log(error);
+    //         return res.status(500).json({ message: "Internal server error" });
+    //     }
+    // }
+    
     uploadFile: async (req, res, next) => {
         try {
             const { patientId, documentId } = req.body
     
-            const existingAttachment = await Attachment.findOne({
+            // Delete all existing attachments for the specified patientId and documentId
+            await Attachment.destroy({
                 where: {
-                    [Op.and]: [{
-                        patientId: patientId
-                    },
-                    {
-                        documentId: documentId
-                    }],
+                    patientId: patientId,
+                    documentId: documentId
                 }
             });
     
-            if (existingAttachment) {
-                // Update existing attachment
-                if (req.files && req.files.length > 0) {
-                    if (req.files.length > 1) {
-                        req.files.forEach(async (item) => {
-                            await existingAttachment.update({
-                                attachment: base64_encode(item.path)
-                            });
-                        });
-                    } else {
-                        await existingAttachment.update({
-                            attachment: base64_encode(req.files[0].path)
-                        });
-                    }
-                } else {
-                    // Handle delete attachment
-                    await existingAttachment.destroy();
-                }
-                return res.status(200).json({ message: "Attachment updated successfully" });
+            // Add new attachments if files are provided
+            if (req.files && req.files.length > 0) {
+                const attachments = req.files.map(file => ({
+                    patientId: patientId,
+                    documentId: documentId,
+                    attachment: base64_encode(file.path)
+                }));
+                await Attachment.bulkCreate(attachments);
+                return res.status(200).json({ message: "Attachments updated successfully" });
             } else {
-                // Create new attachment
-                if (req.files && req.files.length > 0) {
-                    if (req.files.length > 1) {
-                        req.files.forEach(async (item) => {
-                            await Attachment.create({
-                                patientId,
-                                documentId,
-                                attachment: base64_encode(item.path)
-                            });
-                        });
-                    } else {
-                        await Attachment.create({
-                            patientId,
-                            documentId,
-                            attachment: base64_encode(req.files[0].path)
-                        });
-                    }
-                    return res.status(200).json({ message: "Attachment created successfully" });
-                } else {
-                    return res.status(400).json({ message: "No file provided" });
-                }
+                return res.status(400).json({ message: "No file provided" });
             }
         
         } catch (error) {
