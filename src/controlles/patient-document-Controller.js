@@ -89,6 +89,7 @@ const patientDocumentController = {
         return res.status(200).json({
             success: true,
             data: {
+                documentCode: patientDocument?.documentCode,
                 document: {
                     id: patientDocument?.document.id,  
                     title: patientDocument?.document.title,  
@@ -96,6 +97,12 @@ const patientDocumentController = {
                 patient: {
                     id: patientDocument?.patient.id,  
                     address: patientDocument?.patient.address,  
+                    job: patientDocument?.patient.job,  
+                    education: patientDocument?.patient.education,  
+                    maritalStatus: patientDocument?.patient.maritalStatus,  
+                    representative: patientDocument?.patient.representative,  
+                    tel: patientDocument?.patient.tel,  
+                    mobile2: patientDocument?.patient.mobile2,  
                     firstName: patientDocument?.patient.firstName,  
                     lastName: patientDocument?.patient.lastName,  
                     mobile: patientDocument?.patient.mobile,  
