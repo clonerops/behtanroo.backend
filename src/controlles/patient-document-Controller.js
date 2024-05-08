@@ -2,7 +2,7 @@ const { Op } = require("sequelize")
 const Document = require("../models/document")
 const Patient = require("../models/patient")
 const PatientDocument = require("../models/patient_document")
-const  base64_encode  = require("../api/middlewares/convertFileToBase64")
+const base64_encode = require("../api/middlewares/convertFileToBase64")
 const Attachment = require("../models/attachment")
 
 const patientDocumentController = {
@@ -16,18 +16,18 @@ const patientDocumentController = {
                 description,
                 documentCode: Math.floor(Math.random() * 1000000)
             })
-    
+
             return res.status(201).json({
                 success: true,
                 data: result
             })
-    
+
         } catch (error) {
             return res.status(500).json({
                 success: true,
                 data: error
             })
-          
+
         }
     },
 
@@ -61,7 +61,7 @@ const patientDocumentController = {
                 {
                     documentId: req.params.documentId
                 }],
-            }, 
+            },
             // include: [Patient]
             include: [
                 {
@@ -84,30 +84,30 @@ const patientDocumentController = {
                 {
                     documentId: req.params.documentId
                 }],
-            }, 
+            },
         })
         return res.status(200).json({
             success: true,
             data: {
                 documentCode: patientDocument?.documentCode,
                 document: {
-                    id: patientDocument?.document.id,  
-                    title: patientDocument?.document.title,  
+                    id: patientDocument?.document.id,
+                    title: patientDocument?.document.title,
                 },
                 patient: {
-                    id: patientDocument?.patient.id,  
-                    address: patientDocument?.patient.address,  
-                    job: patientDocument?.patient.job,  
-                    education: patientDocument?.patient.education,  
-                    maritalStatus: patientDocument?.patient.maritalStatus,  
-                    representative: patientDocument?.patient.representative,  
-                    tel: patientDocument?.patient.tel,  
-                    mobile2: patientDocument?.patient.mobile2,  
-                    firstName: patientDocument?.patient.firstName,  
-                    lastName: patientDocument?.patient.lastName,  
-                    mobile: patientDocument?.patient.mobile,  
-                    nationalCode: patientDocument?.patient.nationalCode,  
-                    patientCode: patientDocument?.patient.patientCode,  
+                    id: patientDocument?.patient.id,
+                    address: patientDocument?.patient.address,
+                    job: patientDocument?.patient.job,
+                    education: patientDocument?.patient.education,
+                    maritalStatus: patientDocument?.patient.maritalStatus,
+                    representative: patientDocument?.patient.representative,
+                    tel: patientDocument?.patient.tel,
+                    mobile2: patientDocument?.patient.mobile2,
+                    firstName: patientDocument?.patient.firstName,
+                    lastName: patientDocument?.patient.lastName,
+                    mobile: patientDocument?.patient.mobile,
+                    nationalCode: patientDocument?.patient.nationalCode,
+                    patientCode: patientDocument?.patient.patientCode,
                 },
                 attachments: findAttachements
             },
@@ -116,37 +116,49 @@ const patientDocumentController = {
 
     deletePatientDocument: async (req, res, next) => {
         try {
-            const findPatiendDocument = await PatientDocument.findOne({
+            // Delete related attachments first
+            await Attachment.destroy({
                 where: {
-                    [Op.and]: [
-                        {
-                            patientId: req.params.patientId,
-                        },
-                        {
-                            documentId: req.params.documentId
-                        }
-                    ]
+                    patientId: req.params.patientId,
+                    documentId: req.params.documentId
                 }
-            })
+            });
 
-            if(!findPatiendDocument) {
-                return res.status(400).json({
-                    success: true,
-                    message: "پرونده بیمار یافت نشد"
-                })
-            } else {
-                findPatiendDocument.destroy()
-                return res.status(200).json({
-                    success: true,
-                    message: "پرونده بیمار با موفقیت حذف گردید"
-                })
-            }
+            // Now delete the record from PatientDocuments
+            await PatientDocument.destroy({
+                where: {
+                    patientId: req.params.patientId,
+                    documentId: req.params.documentId
+                }
+            });
+
+            return res.status(200).json({
+                success: true,
+                message: "پرونده بیمار با موفقیت حذف گردید"
+            });
+
+            // await PatientDocument.destroy({
+            //     where: {
+            //         [Op.and]: [
+            //             {
+            //                 patientId: req.params.patientId,
+            //             },
+            //             {
+            //                 documentId: req.params.documentId
+            //             }
+            //         ]
+            //     }    
+            // })
+            // return res.status(200).json({
+            //     success: true,
+            //     message: "پرونده بیمار با موفقیت حذف گردید"
+            // })
 
         } catch (error) {
-            return res.status(500).json({ message: "Server Error" })
+            return res.status(500).json({ message: error })
         }
     },
-    
+
     // uploadFile: async (req, res, next) => {
     //     try {
     //         const { patientId, documentId } = req.body
@@ -163,12 +175,12 @@ const patientDocumentController = {
     //         });
 
     //         console.log(findAttach)
-                    
+
     //         if(findAttach.length > 2) {
     //             return res.status(400).json({
     //                 message: 'خطا در آپلود فایل!'
     //             })
- 
+
     //         } else {
     //             if(req.files.length > 1) {
     //                 req.files.map((item) => {
@@ -190,7 +202,7 @@ const patientDocumentController = {
 
     //             }        
     //         }
-    
+
     //     } catch (error) {
     //         console.log(error)
     //         return error
@@ -200,7 +212,7 @@ const patientDocumentController = {
     // uploadFile: async (req, res, next) => {
     //     try {
     //         const { patientId, documentId } = req.body
-    
+
     //         const existingAttachment = await Attachment.findOne({
     //             where: {
     //                 [Op.and]: [{
@@ -211,7 +223,7 @@ const patientDocumentController = {
     //                 }],
     //             }
     //         });
-    
+
     //         if (existingAttachment) {
     //             // Update existing attachment
     //             if (req.files && req.files.length > 0) {
@@ -254,17 +266,17 @@ const patientDocumentController = {
     //                 return res.status(400).json({ message: "No file provided" });
     //             }
     //         }
-        
+
     //     } catch (error) {
     //         console.log(error);
     //         return res.status(500).json({ message: "Internal server error" });
     //     }
     // }
-    
+
     uploadFile: async (req, res, next) => {
         try {
             const { patientId, documentId } = req.body
-    
+
             // Delete all existing attachments for the specified patientId and documentId
             await Attachment.destroy({
                 where: {
@@ -272,7 +284,7 @@ const patientDocumentController = {
                     documentId: documentId
                 }
             });
-    
+
             // Add new attachments if files are provided
             if (req.files && req.files.length > 0) {
                 const attachments = req.files.map(file => ({
@@ -285,14 +297,14 @@ const patientDocumentController = {
             } else {
                 return res.status(400).json({ message: "No file provided" });
             }
-        
+
         } catch (error) {
             console.log(error);
             return res.status(500).json({ message: "Internal server error" });
         }
     }
-    
-    
+
+
 }
 
 module.exports = patientDocumentController
