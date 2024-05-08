@@ -105,6 +105,34 @@ const patientController = {
         }
     },
 
+    deletePatient: async (req, res, next) => {
+        try {
+            // // Now delete the record from PatientDocuments
+            // await PatientDocument.destroy({
+            //     where: {
+            //         patientId: req.params.patientId,
+            //         documentId: req.params.documentId
+            //     }
+            // });
+
+            await Patient.destroy({
+                where: {
+                    id: req.params.id,
+                }
+            });
+
+            return res.status(200).json({
+                success: true,
+                message: "بیمار با موفقیت حذف گردید"
+            });
+
+
+        } catch (error) {
+            return res.status(500).json({ message: error })
+        }
+
+    },
+
     getPatientsById: async (req, res, next) => {
         try {
             const patient = await Patient.findOne({

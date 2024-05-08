@@ -10,6 +10,7 @@ router.get('/exportExcel', authMiddleware.authenticateToken, patientController.e
 router.get('/lists', authMiddleware.authenticateToken, patientController.getAllPatients)
 router.get('/:id', authMiddleware.authenticateToken, patientController.getPatientsById)
 router.get('/:id/referral', authMiddleware.authenticateToken, patientController.getPatientReferralById)
+router.delete('/:id', authMiddleware.authenticateToken, patientController.deletePatient)
 
 
 module.exports = router
