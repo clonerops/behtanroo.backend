@@ -46,7 +46,10 @@ const patientController = {
                     patientCode: Math.floor(Math.random() * 1000000)
                 })
 
-                return res.status(200).json(patient);
+                return res.status(200).json({
+                    succeseded: true,
+                    data: patient
+                });
             }
         } catch (error) {
             return error
