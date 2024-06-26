@@ -1,3 +1,4 @@
+const isNationalIdValid = require("../api/utils/checkNationalCode.js");
 const Document = require("../models/document.js");
 const Patient = require("../models/patient.js");
 const Referral = require("../models/referral.js");
@@ -21,10 +22,16 @@ const patientController = {
                 representative,
                 maritalStatus,
                 description } = req.body;
-            const isExist = await Patient.findOne({ where: { nationalCode: nationalCode } })
-            if (isExist) {
+            const isExist = await Patient.findOne({ where: { mobile: mobile } })
+            if(!isNationalIdValid(nationalCode)) {
                 return res.status(400).json({
-                    message: "بیماری با این کدملی قبلا در سامانه ثبت شده است",
+                    message: "کدملی وارد شده صحیح نمی باشد",
+                    succeseded: false
+                })
+
+            } else if (isExist) {
+                return res.status(400).json({
+                    message: "بیماری با این شماره همراه قبلا در سامانه ثبت شده است",
                     succeseded: false
                 })
             } else {
@@ -74,7 +81,7 @@ const patientController = {
                 maritalStatus, 
                 description
              } = req.body;
-            const findPatient = await Patient.findOne({ where: { nationalCode: nationalCode } })
+            const findPatient = await Patient.findOne({ where: { mobile: mobile } })
 
            await findPatient.update({
                 firstName, 
