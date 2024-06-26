@@ -237,6 +237,7 @@ const reportController = {
             //         },
             //     ]
             // })
+            console.log(documentId)
             const patients = await PatientDocument.findAll({
                 where: documentId != 0 ? {
                     documentId: documentId,
@@ -267,6 +268,8 @@ const reportController = {
                 const referralCount = patientDocument.patient.referrals.length;
                 return referralCount >= fromCount && referralCount <= toCount;
             });
+
+            console.log(patients)
 
             return res.status(200).json({
                 message: true,
