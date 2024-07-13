@@ -16,6 +16,11 @@ const Attachment = sequelize.define('attachment', {
             key: 'patientId'
         }
     },
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+
     documentId: {
         type: DataTypes.INTEGER,
         allowNull: false,

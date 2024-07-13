@@ -8,7 +8,7 @@ const doctorController = {
                 lastName, 
                 mobile, 
                 description } = req.body;
-            const isExist = await Doctor.findOne({ where: { mobile: mobile } })
+            const isExist = await Doctor.findOne({ where: { mobile: mobile, isDeleted: false } })
             if (isExist) {
                 return res.status(400).json({
                     message: "پزشک با این شماره همراه قبلا در سامانه ثبت شده است",
@@ -31,54 +31,43 @@ const doctorController = {
             return error
         }
     },
-    // editPatient: async (req, res, next) => {
-    //     try {
-    //         const { 
-    //             id, 
-    //             firstName, 
-    //             lastName, 
-    //             nationalCode, 
-    //             mobile, 
-    //             mobile2, 
-    //             tel, 
-    //             address, 
-    //             gender,
-    //             birthDate,
-    //             job,
-    //             education,
-    //             representative,
-    //             maritalStatus, 
-    //             description
-    //          } = req.body;
-    //         const findPatient = await Patient.findOne({ where: { mobile: mobile } })
+    editDoctor: async (req, res, next) => {
+        try {
+            const {
+                id, 
+                firstName, 
+                lastName, 
+                mobile, 
+                description} = req.body;
+            const findDoctor = await Doctor.findOne({ where: { id: id, isDeleted: false } })
 
-    //        await findPatient.update({
-    //             firstName, 
-    //             lastName, 
-    //             nationalCode, 
-    //             mobile, 
-    //             mobile2, 
-    //             tel, 
-    //             address, 
-    //             gender,
-    //             birthDate,
-    //             job,
-    //             education,
-    //             representative,
-    //             maritalStatus, 
-    //             description
-    //         })
-    //         return res.status(200).json({message: true})
-    //     } catch (error) {
-    //         return error
-    //     }
-    // },
+           await findDoctor.update({
+                firstName, 
+                lastName, 
+                mobile, 
+                description
+            })
+            return res.status(200).json({message: true})
+        } catch (error) {
+            return error
+        }
+    },
 
     getAllDoctors: async (req, res, next) => {
         try {
 
-            const doctors = await Doctor.findAll()
+            const doctors = await Doctor.findAll({where: {isDeleted: false}})
             return res.status(200).json(doctors)
+        } catch (error) {
+            console.log(error)
+        }
+    },
+
+    getDoctorById: async (req, res, next) => {
+        try {
+            const doctor = await Doctor.findOne({where: { id: req.params.id, isDeleted: false },})
+            return res.status(200).json(doctor)
+
         } catch (error) {
             console.log(error)
         }
@@ -86,12 +75,16 @@ const doctorController = {
 
     deleteDoctor: async (req, res, next) => {
         try {
+            const doctor = await Doctor.findOne({where: { id: req.params.id, isDeleted: false },})
+            await doctor.update({
+                isDeleted: true
+            })
 
-            await Doctor.destroy({
-                where: {
-                    id: req.params.id,
-                }
-            });
+            // await Doctor.destroy({
+            //     where: {
+            //         id: req.params.id,
+            //     }
+            // });
 
             return res.status(200).json({
                 success: true,

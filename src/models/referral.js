@@ -11,6 +11,11 @@ const Referral = sequelize.define("referral",{
     description: {
         type: DataTypes.STRING
     },
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
+
 })
 
 module.exports = Referral

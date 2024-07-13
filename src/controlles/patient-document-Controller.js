@@ -4,16 +4,18 @@ const Patient = require("../models/patient")
 const PatientDocument = require("../models/patient_document")
 const base64_encode = require("../api/middlewares/convertFileToBase64")
 const Attachment = require("../models/attachment")
+const Doctor = require("../models/doctor")
 
 const patientDocumentController = {
     createPatientDocument: async (req, res, next) => {
         try {
-            const { documentId, patientId, description } = req.body
+            const { documentId, patientId, doctorId, description } = req.body
 
             const result = await PatientDocument.create({
                 documentId,
                 patientId,
                 description,
+                doctorId,
                 documentCode: Math.floor(Math.random() * 1000000)
             })
 
@@ -32,7 +34,10 @@ const patientDocumentController = {
     },
 
     listOfPatientDocument: async (req, res, next) => {
-        const results = await PatientDocument.findAll({
+        // Retrieve the documentId from headers, accounting for different possible casing
+        const documentId = req.headers['documentid'] || req.headers['DocumentId'] || req.headers['DocumentID'] || req.headers['documentID'];
+        
+        let queryOptions = {
             include: [
                 {
                     model: Patient,
@@ -41,20 +46,34 @@ const patientDocumentController = {
                 {
                     model: Document,
                     attributes: ['id', 'title']
-
+                },
+                {
+                    model: Doctor,
+                    attributes: ['id', 'firstName', 'lastName']
                 },
             ]
-        })
-        return res.status(200).json({
-            success: true,
-            data: results
-        })
-
+        };
+    
+        if (documentId != '-1' && documentId) { // Ensure documentId is not undefined and not -1
+            queryOptions.where = { documentId: documentId };
+        }
+    
+        try {
+            const results = await PatientDocument.findAll(queryOptions);
+            return res.status(200).json({
+                success: true,
+                data: results
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'An error occurred', error });
+        }
     },
 
-    getPatientDocumnetById: async (req, res, next) => {
+        getPatientDocumnetById: async (req, res, next) => {
         const patientDocument = await PatientDocument.findOne({
             where: {
+                isDeleted: false,
                 [Op.and]: [{
                     patientId: req.params.patientId
                 },
@@ -68,6 +87,10 @@ const patientDocumentController = {
                     model: Patient,
                 },
                 {
+                    model: Doctor,
+                    attributes: ['id', 'firstName', 'lastName']
+                },
+                {
                     model: Document,
                     attributes: ['id', 'title']
 
@@ -78,6 +101,7 @@ const patientDocumentController = {
 
         const findAttachements = await Attachment.findAll({
             where: {
+                isDeleted: false,
                 [Op.and]: [{
                     patientId: req.params.patientId
                 },
@@ -117,20 +141,31 @@ const patientDocumentController = {
     deletePatientDocument: async (req, res, next) => {
         try {
             // Delete related attachments first
-            await Attachment.destroy({
-                where: {
-                    patientId: req.params.patientId,
-                    documentId: req.params.documentId
-                }
-            });
+            // await Attachment.destroy({
+            //     where: {
+            //         patientId: req.params.patientId,
+            //         documentId: req.params.documentId
+            //     }
+            // });
 
-            // Now delete the record from PatientDocuments
-            await PatientDocument.destroy({
+            // // Now delete the record from PatientDocuments
+            // await PatientDocument.destroy({
+            //     where: {
+            //         patientId: req.params.patientId,
+            //         documentId: req.params.documentId
+            //     }
+            // });
+            const patientDocument = await PatientDocument.findOne({
                 where: {
                     patientId: req.params.patientId,
                     documentId: req.params.documentId
                 }
-            });
+        })
+
+            await patientDocument.update({
+                isDeleted: true
+            })
+
 
             return res.status(200).json({
                 success: true,

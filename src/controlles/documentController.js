@@ -14,7 +14,7 @@ const documentController = {
     },
 
     getDocuments: async (req, res, next) => {
-        const documents = await Document.findAll()
+        const documents = await Document.findAll({where: {isDeleted: false}})
         return res.status(200).json({
             success: true,
             data: documents
@@ -22,7 +22,7 @@ const documentController = {
     },
 
     getDocument: async (req, res, next) => {
-        const document = await Document.findOne({ where: { id: req.params.id }, include: [Patient, Referral] })
+        const document = await Document.findOne({ where: { id: req.params.id,isDeleted: false }, include: [Patient, Referral] })
         return res.status(200).json({
             success: true,
             data: document
@@ -30,7 +30,7 @@ const documentController = {
     },
 
     updateDocument: async (req, res, next) => {
-        const findDocument = await Document.findOne({ where: { id: req.params.id } })
+        const findDocument = await Document.findOne({ where: { id: req.params.id, isDeleted: false } })
         if (!findDocument) {
             return res.status(400).json({
                 success: false,
@@ -43,7 +43,7 @@ const documentController = {
     },
 
     deleteDocument: async (req, res, next) => {
-        const findDocument = await Document.findOne({ where: { id: req.params.id } })
+        const findDocument = await Document.findOne({ where: { id: req.params.id, isDeleted: false } })
         if (!findDocument) {
             return res.status(400).json({
                 success: false,

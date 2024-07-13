@@ -1,12 +1,16 @@
-const { DataTypes } =  require('sequelize')
-const sequelize =  require('../database/connection');
+const { DataTypes } = require('sequelize')
+const sequelize = require('../database/connection');
 const Referral = require('./referral');
-const Attachment = require('./attachment');
 
-const Document = sequelize.define("document",{
+const Document = sequelize.define("document", {
     title: {
         type: DataTypes.STRING
+    },
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
+
 })
 
 Document.hasMany(Referral)

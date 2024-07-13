@@ -2,9 +2,6 @@
 const { DataTypes } =  require('sequelize')
 const Referral =  require('./referral')
 const sequelize =  require('../database/connection');
-const Document = require('./document');
-const Attachment = require('./attachment');
-
 
 const Patient = sequelize.define("patient",{
     firstName: {
@@ -66,6 +63,10 @@ const Patient = sequelize.define("patient",{
     patientCode: {
         type: DataTypes.INTEGER,
     },
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 
 }, {
     hooks: {

@@ -1,6 +1,7 @@
 
 const { DataTypes } =  require('sequelize')
 const sequelize =  require('../database/connection');
+const PatientDocument = require('./patient_document');
 
 
 const Doctor = sequelize.define("doctor",{
@@ -18,7 +19,14 @@ const Doctor = sequelize.define("doctor",{
     description: {
         type: DataTypes.TEXT
     },
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 
 })
+
+Doctor.hasMany(PatientDocument, {onDelete: 'cascade'});
+PatientDocument.belongsTo(Doctor, { onDelete: 'cascade'}); 
 
 module.exports = Doctor

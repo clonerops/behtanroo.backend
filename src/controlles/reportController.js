@@ -18,6 +18,7 @@ const reportController = {
 
             const patientsResult = await PatientDocument.findAll({
                 where: {
+                    isDeleted: false,
                     [documentId != 0 ? Op.and : Op.or]: [
                         {
                             createdAt: {
@@ -73,6 +74,7 @@ const reportController = {
 
             const patientsResult = await PatientDocument.findAll({
                 where: {
+                    isDeleted: false,
                     [documentId != 0 ? Op.and : Op.or]: [
                         {
                             createdAt: {
@@ -327,6 +329,7 @@ const reportController = {
             const patients = await PatientDocument.findAll({
                 where: documentId != 0 ? {
                     documentId: documentId,
+                    isDeleted: false,
                     createdAt: {
                         [Op.between]: [utcFromDate, utcToDate]
                     }

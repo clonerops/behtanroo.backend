@@ -22,14 +22,15 @@ const patientController = {
                 representative,
                 maritalStatus,
                 description } = req.body;
-            const isExist = await Patient.findOne({ where: { mobile: mobile } })
-            if(!isNationalIdValid(nationalCode)) {
-                return res.status(400).json({
-                    message: "کدملی وارد شده صحیح نمی باشد",
-                    succeseded: false
-                })
+            const isExist = await Patient.findOne({ where: { mobile: mobile, isDeleted: false } })
+            // if(!isNationalIdValid(nationalCode)) {
+            //     return res.status(400).json({
+            //         message: "کدملی وارد شده صحیح نمی باشد",
+            //         succeseded: false
+            //     })
 
-            } else if (isExist) {
+            // } else 
+            if (isExist) {
                 return res.status(400).json({
                     message: "بیماری با این شماره همراه قبلا در سامانه ثبت شده است",
                     succeseded: false
@@ -81,7 +82,7 @@ const patientController = {
                 maritalStatus, 
                 description
              } = req.body;
-            const findPatient = await Patient.findOne({ where: { mobile: mobile } })
+            const findPatient = await Patient.findOne({ where: { mobile: mobile, isDeleted: false } })
 
            await findPatient.update({
                 firstName, 
@@ -106,10 +107,16 @@ const patientController = {
     },
 
     getAllPatients: async (req, res, next) => {
+        const isActive = req.headers['isactive'] || req.headers['IsActive'] || req.headers['isActive'];
         try {
-
-            const patients = await Patient.findAll({ include: { model: Referral } })
-            return res.status(200).json(patients)
+            let queryOptions = {
+                include: { model: Referral }
+            };
+            if (isActive != '2') {
+                queryOptions.where = { isDeleted: isActive == '0' ? false : true };
+            }
+            const patients = await Patient.findAll(queryOptions);
+                return res.status(200).json(patients)
         } catch (error) {
             console.log(error)
         }
@@ -124,12 +131,22 @@ const patientController = {
             //         documentId: req.params.documentId
             //     }
             // });
+            const patient = await Patient.findOne({
+                where: { id: req.params.id, isDeleted: false },
+                include: [
+                    {model: Document},
+                    {model: Referral},
+                ]
+            })
+            await patient.update({
+                isDeleted: true, 
+            })
 
-            await Patient.destroy({
-                where: {
-                    id: req.params.id,
-                }
-            });
+            // await Patient.destroy({
+            //     where: {
+            //         id: req.params.id,
+            //     }
+            // });
 
             return res.status(200).json({
                 success: true,
@@ -146,7 +163,7 @@ const patientController = {
     getPatientsById: async (req, res, next) => {
         try {
             const patient = await Patient.findOne({
-                where: { id: req.params.id },
+                where: { id: req.params.id, isDeleted: true },
                 include: [
                     {model: Document},
                     {model: Referral},
@@ -162,7 +179,7 @@ const patientController = {
     getPatientReferralById: async (req, res, next) => {
         try {
             const patient = await Patient.findOne({
-                where: { id: req.params.id },
+                where: { id: req.params.id, isDeleted: true },
 
                 include: Referral
             })
@@ -176,7 +193,7 @@ const patientController = {
     exportExcelPatientList: async (req, res, next) => {
         try {
 
-            const patients = await Patient.findAll()
+            const patients = await Patient.findAll({where: {isDeleted: false}})
             let workSheet = new exceljs.Workbook()
             const sheet = workSheet.addWorksheet("patients")
             sheet.columns = [
